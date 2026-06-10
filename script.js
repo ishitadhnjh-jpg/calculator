@@ -1,13 +1,36 @@
 // script.js
-// Calculator functionality
 document.addEventListener('DOMContentLoaded', () => {
   const display = document.getElementById('display');
   const buttons = document.querySelectorAll('.btn');
   const equalsBtn = document.getElementById('equals');
   const clearBtn = document.getElementById('clear');
+  const deleteBtn = document.getElementById('delete');
+  const undoBtn = document.getElementById('undo');
+  const clearHistoryBtn = document.getElementById('clearHistory');
+  const historyList = document.getElementById('historyList');
+  const themeSelect = document.getElementById('themeSelect');
 
-  // Helper to update display safely
-  const appendToDisplay = (value) => {
+  const history = [];
+  const maxHistory = 50;
+
+  const renderHistory = () => {
+    historyList.innerHTML = '';
+    if (history.length === 0) {
+      const emptyLi = document.createElement('li');
+      emptyLi.className = 'empty-history';
+      emptyLi.textContent = 'No calculations yet';
+      historyList.appendChild(emptyLi);
+      return;
+    }
+
+    history.slice().reverse().forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      historyList.appendChild(li);
+    });
+  };
+
+  const appendToDisplay = value => {
     if (display.value === '0' && !isNaN(value)) {
       display.value = value;
     } else {
@@ -15,30 +38,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Clear screen
-  clearBtn?.addEventListener('click', () => {
+  clearBtn.addEventListener('click', () => {
+    if (display.value) {
+      history.push(`C → ${display.value}`);
+      if (history.length > maxHistory) history.shift();
+      renderHistory();
+    }
     display.value = '';
   });
 
-  // Button clicks (numbers and operators)
-  buttons.forEach((btn) => {
-    const val = btn.dataset.value;
-    if (!val) return; // skip non-data-value buttons like equals handled separately
-    btn.addEventListener('click', () => {
-      appendToDisplay(val);
-    });
+  deleteBtn.addEventListener('click', () => {
+  if (display.value) {
+    // Save current state for undo
+    history.push(`DEL → ${display.value}`);
+    if (history.length > maxHistory) history.shift();
+
+    // Remove only the last character (single digit/operator)
+    display.value = display.value.slice(0, -1);
+    renderHistory();
+  }
+});
+
+  undoBtn.addEventListener('click', () => {
+    if (!history.length) return;
+    const last = history.pop();
+    const calcMatch = last.match(/^(.*) = /);
+    if (calcMatch) {
+      display.value = calcMatch[1];
+    } else if (last.startsWith('C →')) {
+      display.value = last.split('C → ')[1] || '';
+    } else if (last.startsWith('DEL →')) {
+      display.value = last.split('DEL → ')[1] || '';
+    }
+    renderHistory();
   });
 
-  // Evaluate expression
-  equalsBtn?.addEventListener('click', () => {
+  clearHistoryBtn.addEventListener('click', () => {
+    history.length = 0;
+    renderHistory();
+  });
+
+  buttons.forEach(btn => {
+    const val = btn.dataset.value;
+    if (!val) return;
+    btn.addEventListener('click', () => appendToDisplay(val));
+  });
+
+  equalsBtn.addEventListener('click', () => {
     try {
-      // Replace UI symbols with JS operators
       let expr = display.value.replace(/÷/g, '/').replace(/×/g, '*');
-      // Prevent empty expression
       if (!expr) return;
-      // Evaluate safely
-      // Using Function to avoid eval security concerns in this isolated sandbox
       const result = Function(`"use strict"; return (${expr})`)();
+      const entry = `${display.value} = ${result}`;
+      history.push(entry);
+      if (history.length > maxHistory) history.shift();
+      renderHistory();
       display.value = String(result);
     } catch (e) {
       display.value = 'Error';
@@ -46,29 +100,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // -------------------- Image Filter Section --------------------
+  const applyTheme = theme => {
+    document.body.className = '';
+    document.body.classList.add(`theme-${theme}`);
+  };
+  themeSelect.addEventListener('change', e => applyTheme(e.target.value));
+  applyTheme(themeSelect.value || 'pink');
+
+  // Image filter section
   const imageInput = document.getElementById('imageUploader');
   const previewImg = document.getElementById('filterImage');
   const filterButtonsDiv = document.getElementById('filterButtons');
 
   if (imageInput) {
-    imageInput.addEventListener('change', (e) => {
+    imageInput.addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
       const url = URL.createObjectURL(file);
       previewImg.src = url;
       previewImg.classList.remove('hidden');
       filterButtonsDiv.classList.remove('hidden');
-      // Reset filter
       previewImg.style.filter = 'none';
+
+      // Reset active filter button styling
+      const filterBtns = filterButtonsDiv.querySelectorAll('.filter-btn');
+      filterBtns.forEach(btn => btn.classList.remove('active'));
+      const normalBtn = filterButtonsDiv.querySelector('[data-filter="none"]');
+      if (normalBtn) normalBtn.classList.add('active');
     });
   }
 
-  // Apply selected filter
   if (filterButtonsDiv) {
-    filterButtonsDiv.addEventListener('click', (e) => {
+    filterButtonsDiv.addEventListener('click', e => {
       const btn = e.target.closest('button');
       if (!btn) return;
+      
+      // Toggle active filter styles
+      const filterBtns = filterButtonsDiv.querySelectorAll('.filter-btn');
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
       const filter = btn.dataset.filter;
       previewImg.style.filter = filter;
     });

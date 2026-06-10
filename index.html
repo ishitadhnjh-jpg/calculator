@@ -5,41 +5,109 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Princess Pink Calculator</title>
+    
+    <!-- Google Fonts: Sofia (for magical title) and Outfit (elegant sans-serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Sofia&display=swap" rel="stylesheet" />
+    
     <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="theme-pink">
+    <!-- Glassmorphic Animated Background Orbs -->
+    <div class="orb-container">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
     <div class="app-container">
         <h1 class="title">✨ Princess Pink Calculator ✨</h1>
-        <div class="calculator">
+        
+        <!-- Theme Switcher Panel -->
+        <div class="glass-card theme-panel">
+            <label for="themeSelect">✨ Magic Mode:</label>
+            <select id="themeSelect" class="theme-dropdown">
+                <option value="pink" selected>🌸 Princess Pink</option>
+                <option value="dark">🌌 Midnight Glass</option>
+                <option value="white">❄️ Crystal Snow</option>
+            </select>
+        </div>
+
+        <!-- Calculator Panel -->
+        <div class="glass-card calculator">
             <input type="text" id="display" class="display" readonly placeholder="0" />
             <div class="buttons-grid">
+                <button class="btn spec-btn" id="clear">C</button>
+                <button class="btn spec-btn" id="delete">⌫</button>
+                <button class="btn spec-btn" id="undo">↶</button>
+                <button class="btn operator" data-value="/">÷</button>
+
                 <button class="btn" data-value="7">7</button>
                 <button class="btn" data-value="8">8</button>
                 <button class="btn" data-value="9">9</button>
-                <button class="btn operator" data-value="/">÷</button>
+                <button class="btn operator" data-value="*">×</button>
+
                 <button class="btn" data-value="4">4</button>
                 <button class="btn" data-value="5">5</button>
                 <button class="btn" data-value="6">6</button>
-                <button class="btn operator" data-value="*">×</button>
+                <button class="btn operator" data-value="-">−</button>
+
                 <button class="btn" data-value="1">1</button>
                 <button class="btn" data-value="2">2</button>
                 <button class="btn" data-value="3">3</button>
-                <button class="btn operator" data-value="-">−</button>
-                <button class="btn" data-value="0">0</button>
-                <button class="btn" data-value=".">.</button>
-                <button class="btn" id="clear">C</button>
                 <button class="btn operator" data-value="+">+</button>
-                <button class="btn equal" id="equals" colspan="4">=</button>
+
+                <button class="btn zero" data-value="0">0</button>
+                <button class="btn" data-value=".">.</button>
+                <button class="btn equal" id="equals">=</button>
             </div>
         </div>
-        <div class="image-filter-section">
-            <h2>Princess Gallery (just for fun)</h2>
+
+        <!-- History Panel -->
+        <div class="glass-card history-panel">
+            <div class="history-header">
+                <h2>📜 Calculation History</h2>
+                <button class="btn spec-btn action-btn" id="clearHistory">🗑️ Clear</button>
+            </div>
+            <ul id="historyList" class="history-list">
+                <li class="empty-history">No calculations yet</li>
+            </ul>
+        </div>
+
+        <!-- Princess Gallery & Studio Panel -->
+        <div class="glass-card gallery-panel">
+            <h2>🌸 Princess Gallery</h2>
             <div class="princess-gallery">
-                <img src="princess1.png" alt="Princess 1" class="princess-img" />
-                <img src="princess2.png" alt="Princess 2" class="princess-img" />
+                <div class="img-frame">
+                    <img src="princess1.png" alt="Princess 1" class="princess-img" />
+                </div>
+                <div class="img-frame">
+                    <img src="princess2.png" alt="Princess 2" class="princess-img" />
+                </div>
+            </div>
+
+            <!-- Princess Photo Studio Section -->
+            <div class="image-filter-section">
+                <h3>✨ Princess Photo Studio</h3>
+                <div class="upload-container">
+                    <label for="imageUploader" class="custom-file-upload">
+                        📸 Upload Princess Image
+                    </label>
+                    <input type="file" id="imageUploader" accept="image/*" />
+                </div>
+                
+                <div class="image-preview-wrapper">
+                    <img id="filterImage" src="" alt="Filtered Preview" class="hidden filter-preview" />
+                </div>
+
+                <div id="filterButtons" class="filter-buttons hidden">
+                    <button class="filter-btn active" data-filter="none">Normal</button>
+                    <button class="filter-btn" data-filter="hue-rotate(300deg) saturate(2) contrast(1.1)">🌸 Rose Tint</button>
+                    <button class="filter-btn" data-filter="sepia(70%) saturate(1.5)">🍂 Vintage Gold</button>
+                    <button class="filter-btn" data-filter="grayscale(100%) brightness(1.1)">🤍 Classic Portrait</button>
+                    <button class="filter-btn" data-filter="blur(1.5px) contrast(1.1) brightness(1.05)">✨ Dreamy Glow</button>
+                </div>
             </div>
         </div>
     </div>
